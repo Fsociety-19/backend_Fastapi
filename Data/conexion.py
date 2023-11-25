@@ -3,7 +3,6 @@ from mysql.connector import Error
 
 
 class Conexion():
-
     def create():
         try:
             conexion = mysql.connector.connect(
@@ -11,11 +10,11 @@ class Conexion():
                 port=3306,
                 user='backend',
                 password='1234',
-                db='appointmenthub'
+                db='appointmenthub',
             ) 
             return conexion
         except Error as ex:
-            print("Error al intentar la conexión: {0}".format(ex))
+            raise NameError("Error al intentar la conexión: {0}".format(ex))
         
 
     
