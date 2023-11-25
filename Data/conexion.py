@@ -9,8 +9,8 @@ class Conexion():
             conexion = mysql.connector.connect(
                 host='localhost',
                 port=3306,
-                user='root',
-                password='',
+                user='backend',
+                password='1234',
                 db='appointmenthub'
             ) 
         except Error as ex:
