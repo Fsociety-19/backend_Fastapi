@@ -54,7 +54,6 @@ class User():
                 return {"resultado":"error: "+error,}
         else:
             return {"resultado":"Error desconocido.db"}
-    
     def create(User:UserModel):
         conexion=Conexion.create()
         if conexion.is_connected():
@@ -68,6 +67,32 @@ class User():
                 return {"resultado":"error"}
         else:
             return {"resultado":"Error desconocido.db"}
+    def getAdmins():
+            conexion=Conexion.create()
+            if conexion.is_connected():
+                try:
+                    cursor=conexion.cursor()
+                    cursor.execute('SELECT us.id,det.name,det.lastName FROM users us JOIN detailuser det ON det.idUser=us.id WHERE us.idTypeUser=2')
+                    result=cursor.fetchall()
+                    payload=[]
+                    content={}
+                    for data in result:
+                        content={
+                            'id':data[0],
+                            'name':(data[1]+" "+data[2]),
+                        }
+                        payload.append(content)
+                        content={}
+                    cursor.close()
+                    conexion.close()
+                    if payload is None or payload==[]:
+                        return{"resultado":"Usuario no encontrado"}
+                    else:
+                        return (payload)    
+                except Exception as error:
+                    return {"resultado":"error: "+str(error),}
+            else:
+                return {"resultado":"Error desconocido.db"}                
     def getOne(id:int):
         conexion=Conexion.create()
         if conexion.is_connected():

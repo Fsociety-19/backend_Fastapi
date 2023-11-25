@@ -15,11 +15,8 @@ class AppointMent():
                                appointments.date,
                                statusappointments.name as "statusAppointMent",
                                appointments.detail,
-                               appointments.idstudent,
-                               detailuser.dni as "dni", 
-                               detailuser.name as "name student", 
-                               detailuser.lastName as "lastName student" 
-                               FROM appointments INNER JOIN users ON users.id=appointments.idstudent INNER JOIN detailuser ON detailuser.id=users.id INNER JOIN statusappointments ON statusappointments.id=appointments.idStatusAppointment ORDER BY appointments.date DESC;''')
+                               appointments.idstudent
+                               FROM appointments INNER JOIN statusappointments ON statusappointments.id=appointments.idStatusAppointment  ORDER BY appointments.date DESC;''',)
                 result=cursor.fetchall()
                 payload=[]
                 content={}
@@ -31,14 +28,47 @@ class AppointMent():
                         'hour':data[3],
                         'date':data[4],
                         'status':data[5],
-                        'detail':data[6],
-                        'student':{
-                            'idStudent':data[7],
-                            'dni':data[8],
-                            'name':data[9],
-                            'lastName':data[10],
-                        }
-                        
+                        'detail':data[6]
+                    }
+                    payload.append(content)
+                    content={}
+                cursor.close()
+                conexion.close()
+                if payload is None or payload==[]:
+                    return{"resultado":"No hay registros"}
+                else:
+                    return (payload)
+            except Exception as error:
+                return {"resultado":"error: "+str(error),}
+        else:
+            return {"resultado":"Error desconocido.db"}
+    def getbyStaff(id:int):   
+        conexion=Conexion.create()
+        if conexion.is_connected():
+            try:
+                cursor=conexion.cursor()
+                cursor.execute('''SELECT 
+                               appointments.id,
+                               appointments.reason,
+                               appointments.idAdminStaff,
+                               appointments.hour,
+                               appointments.date,
+                               statusappointments.name as "statusAppointMent",
+                               appointments.detail,
+                               appointments.idstudent
+                               FROM appointments INNER JOIN statusappointments ON statusappointments.id=appointments.idStatusAppointment WHERE appointments.idAdminStaff=%s ORDER BY appointments.date DESC;''',(id,))
+                result=cursor.fetchall()
+                payload=[]
+                content={}
+                for data in result:
+                    content={
+                        'id':data[0],
+                        'reason':data[1],
+                        'idAdmin':data[2],
+                        'hour':data[3],
+                        'date':data[4],
+                        'status':data[5],
+                        'detail':data[6]
                     }
                     payload.append(content)
                     content={}
@@ -101,7 +131,7 @@ class AppointMent():
                                appointments.idAdminStaff,
                                appointments.hour,
                                appointments.date,
-                               statusappointments.name as "statusAppointMent",
+                               appointments.idStatusAppointment  as "statusAppointMent",
                                appointments.detail,
                                appointments.idstudent,
                                detailuser.dni as "dni", 
