@@ -156,9 +156,9 @@ class AppointMent():
                         'detail':data[6],
                         'student':{
                             'idStudent':data[7],
-                        'dni':data[8],
-                        'name':data[9],
-                        'lastName':data[10],
+                            'dni':data[8],
+                            'name':data[9],
+                            'lastName':data[10],
                         }
                         
                     }
@@ -172,6 +172,59 @@ class AppointMent():
                 return {"resultado":"error: "+str(error),}
         else:
             return {"resultado":"Error desconocido.db"}
+    def getAdminStafByAppoint(id:int):
+        conexion=Conexion.create()
+        if conexion.is_connected():
+            try:
+                cursor=conexion.cursor()
+                cursor.execute('''SELECT 
+                               appointments.id,
+                               appointments.reason,
+                               appointments.idAdminStaff,
+                               appointments.hour,
+                               appointments.date,
+                               appointments.idStatusAppointment  as "statusAppointMent",
+                               appointments.detail,
+                               appointments.idstudent,
+                               detailuser.dni as "dni", 
+                               detailuser.name as "name student", 
+                               detailuser.lastName as "lastName student" 
+                               FROM appointments 
+                               INNER JOIN users ON users.id=appointments.idstudent 
+                               INNER JOIN detailuser ON detailuser.id=users.id 
+                               INNER JOIN statusappointments ON statusappointments.id=appointments.idStatusAppointment 
+                               WHERE appointments.id= %s ''',(id,))
+                result=cursor.fetchall()
+                payload=[]
+                content={}
+                for data in result:
+                    content={
+                        'id':data[0],
+                        'reason':data[1],
+                        'idAdmin':data[2],
+                        'hour':data[3],
+                        'date':data[4],
+                        'status':data[5],
+                        'detail':data[6],
+                        'student':{
+                            'idStudent':data[7],
+                            'dni':data[8],
+                            'name':data[9],
+                            'lastName':data[10],
+                        }
+                        
+                    }
+                    payload.append(content)
+                    content={}
+                if payload is None or payload==[]:
+                    return{"resultado":"Reserva no encontrada"}
+                else:
+                    return (payload)
+            except Exception as error:
+                return {"resultado":"error: "+str(error),}
+        else:
+            return {"resultado":"Error desconocido.db"}
+
     def update(id:int,data:AppointMentModel):
         conexion=Conexion.create()
         if conexion.is_connected():
